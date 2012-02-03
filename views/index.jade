@@ -1,0 +1,11 @@
+div#terminal
+  div#console
+    div#output
+    //div#prompt=user + '@ncsh $\ '
+    div#prompt
+      span=user
+      | @ncsh $
+    input#commandLine(autofocus='on',autocomplete='off', type='text', name='cursor')
+    div#auth
+  div#notif
+  div#debug
