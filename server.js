@@ -7,12 +7,44 @@ var connect = require('connect'),
     jade = require('jade'),
     port = (process.env.PORT || 13319),
     user = 'guest',
-    testModules = require( __dirname + '/commands')
+    testModules = require( __dirname + '/commands'),
     hello = require('./hello');
 
 
     io = require('socket.io');
 
+everyauth = require('everyauth'),
+    Promise = everyauth.Promise;
+
+var Schema = mongoose.Schema,
+    mongooseAuth = require('mongoose-auth');
+
+var UserSchema = new Schema({});
+UserSchema.plugin(mongooseAuth, {
+    everymodule: {
+        everyauth: {
+            User: function () {
+                return User;
+            }
+        }
+    },
+    password:  {
+        everyauth: {
+            getLoginPath: '/login',
+            postLoginPath: '/login',
+            loginView: 'login.jade',
+            getRegisterPath: '/register',
+            postRegisterPath: '/register',
+            registerView: 'register.jade',
+            loginSuccessRedirect: '/',
+            registerSuccessRedirect: '/'
+        }
+    }
+});
+
+mongoose.model('User', UserSchema);
+mongoose.connect("mongodb://nodejitsu:21d794e2ac3327bcbe9f136095309b86@staff.mongohq.com:10055/nodejitsudb4286992237");
+User = mongoose.model('User');
 
 console.log("testModules : ", testModules);
 
@@ -25,7 +57,10 @@ server.configure(function(){
     server.use(express.session({ secret: "shhhhhhhhh!"}));
     server.use(connect.static(__dirname + '/static'));
     server.use(server.router);
+    server.use(mongooseAuth.middleware());
 });
+
+mongooseAuth.helpExpress(server);
 
 //setup the errors
 server.error(function(err, req, res, next){
