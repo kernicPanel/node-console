@@ -69,6 +69,7 @@ io.sockets.on('connection', function(socket){
   socket.on('command', function (data) {
       console.log("data : ", data);
       //socket.emit('output', data);
+      socket.broadcast.emit('output', parse(data, socket) );
       socket.emit('output', parse(data, socket) );
       //socket.emit('output', path);
   });
